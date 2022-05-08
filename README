@@ -1,0 +1,187 @@
+dsss-transfer
+=============
+
+dsss-transfer is a command-line program to send or receive data by software
+defined radio using the DSSS modulation.
+
+
+## Usage
+
+dsss-transfer [options] [filename]
+
+Options:
+  -a
+    Use audio samples instead of IQ samples.
+  -b <bit rate>  (default: 100 b/s)
+    Bit rate of the DSSS transmission.
+  -c <ppm>  (default: 0.0, can be negative)
+    Correction for the radio clock.
+  -d <filename>
+    Dump a copy of the samples sent to or received from
+    the radio.
+  -e <fec[,fec]>  (default: h128,none)
+    Inner and outer forward error correction codes to use.
+  -f <frequency>  (default: 434000000 Hz)
+    Frequency of the DSSS transmission.
+  -g <gain>  (default: 0)
+    Gain of the radio transceiver.
+  -h
+    This help.
+  -i <id>  (default: "")
+    Transfer id (at most 4 bytes). When receiving, the frames
+    with a different id will be ignored.
+  -o <offset>  (default: 0 Hz, can be negative)
+    Set the central frequency of the transceiver 'offset' Hz
+    lower than the signal frequency to send or receive.
+  -r <radio type>  (default: "")
+    Radio to use.
+  -s <sample rate>  (default: 2000000 S/s)
+    Sample rate to use.
+  -T <timeout>  (default: 0 s)
+    Number of seconds after which reception will be stopped if
+    no frame has been received. A timeout of 0 means no timeout.
+  -t
+    Use transmit mode.
+  -v
+    Print debug messages.
+  -w <delay>  (default: 0.0 s)
+    Wait a little before switching the radio off.
+    This can be useful if the hardware needs some time to send
+    the last samples it has buffered.
+
+By default the program is in 'receive' mode.
+Use the '-t' option to use the 'transmit' mode.
+
+In 'receive' mode, the samples are received from the radio,
+and the decoded data is written either to 'filename' if it
+is specified, or to standard output.
+In 'transmit' mode, the data to send is read either from
+'filename' if it is specified, or from standard input,
+and the samples are sent to the radio.
+
+Instead of a real radio transceiver, the 'io' radio type uses
+standard input in 'receive' mode, and standard output in
+'transmit' mode.
+The 'file=path-to-file' radio type reads/writes the samples
+from/to 'path-to-file'.
+The IQ samples must be in 'complex float' format
+(32 bits for the real part, 32 bits for the imaginary part).
+The audio samples must be in 'signed integer' format (16 bits).
+
+The gain parameter can be specified either as an integer to set a
+global gain, or as a series of keys and values to set specific
+gains (for example 'LNA=32,VGA=20').
+
+
+## Compilation
+
+dsss-transfer requires the following dependencies:
+  - libliquid (https://github.com/jgaeddert/liquid-dsp)
+  - libSoapySDR (https://github.com/pothosware/SoapySDR)
+
+It can be compiled with the usual:
+
+    ./autogen.sh
+    ./configure
+    make
+
+
+## Supported radios
+
+dsss-transfer uses the SoapySDR API, therefore if your radio is supported by
+SoapySDR and you have the right driver installed, it should work.
+
+When used with the '-h' option to print the help message, dsss-transfer will
+also list the radios that it has detected.
+
+
+## Supported FEC codes
+
+The forward error correction codes that can be specified with the '-e' option
+are the codes that are supported by libliquid.
+
+These should always be available:
+  - none
+  - rep3: repeat(3)
+  - rep5: repeat(5)
+  - h74: Hamming(7,4)
+  - h84: Hamming(8,4)
+  - h128: Hamming(12,8)
+  - g2412: Golay(24,12)
+  - secded2216: SEC-DEC(22,16)
+  - secded3932: SEC-DEC(39,32)
+  - secded7264: SEC-DEC(72,64)
+
+If your libliquid library has been compiled with support for the libfec
+library, the following codes should also be available:
+  - v27: convolutional r1/2 K=7
+  - v29: convolutional r1/2 K=9
+  - v39: convolutional r1/3 K=9
+  - v615: convolutional r1/6 K=15
+  - v27p23: convolutional r2/3 K=7 (punctured)
+  - v27p34: convolutional r3/4 K=7 (punctured)
+  - v27p45: convolutional r4/5 K=7 (punctured)
+  - v27p56: convolutional r5/6 K=7 (punctured)
+  - v27p67: convolutional r6/7 K=7 (punctured)
+  - v27p78: convolutional r7/8 K=7 (punctured)
+  - v29p23: convolutional r2/3 K=9 (punctured)
+  - v29p34: convolutional r3/4 K=9 (punctured)
+  - v29p45: convolutional r4/5 K=9 (punctured)
+  - v29p56: convolutional r5/6 K=9 (punctured)
+  - v29p67: convolutional r6/7 K=9 (punctured)
+  - v29p78: convolutional r7/8 K=9 (punctured)
+  - rs8: Reed-Solomon, 223/255
+
+
+## Examples
+
+Send a file at 100 b/s on 434 MHz using a HackRF:
+
+    dsss-transfer -t \
+                  -r driver=hackrf \
+                  -s 4000000 \
+                  -f 434000000 \
+                  -o 100000 \
+                  -b 100 \
+                  -g 30 \
+                  -w 1 \
+                  input_file
+
+Receive a file at 100 b/s on 434 MHz using a RTL-SDR:
+
+    dsss-transfer -r driver=rtlsdr \
+                  -s 2000000 \
+                  -f 434000000 \
+                  -o 100000 \
+                  -b 100 \
+                  -g 20 \
+                  -T 30 \
+                  output_file
+
+Generate audio samples for a 30 b/s transmission centered at 1500 Hz and play
+them:
+
+    dsss-transfer -t \
+                  -r file=/tmp/samples.s16 \
+                  -a \
+                  -s 48000 \
+                  -f 1500 \
+                  -b 30 \
+                  input_file
+    aplay -f S16_LE -r 48000 -c 1 /tmp/samples.s16
+
+
+## Library
+
+You can add DSSS transfer support to your programs easily by using the
+'libdsss-transfer' library.
+The API is described in the 'dsss-transfer.h' file.
+
+The 'echo-server' example program shows how to use the API to make a server
+receiving messages from clients and sending them back in reverse order.
+
+The 'duplex' example program shows how to use the API to make a duplex link
+using two devices.
+
+The 'duplex-ppp.sh' script shows how to make a PPP connection between two
+machines using the 'duplex' example program.
