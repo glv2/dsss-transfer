@@ -31,7 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define UPLINK_SAMPLE_RATE 4000000
 #define UPLINK_GAIN "36"
 #define UPLINK_FREQUENCY_OFFSET 100000
-#define BIT_RATE 1200
+#define BIT_RATE 2400
 #define INNER_FEC "none"
 #define OUTER_FEC "secded3932"
 
