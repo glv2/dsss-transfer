@@ -41,7 +41,7 @@ void signal_handler(int signum)
 
 void usage()
 {
-  printf("dsss-transfer version 1.0.0\n");
+  printf("dsss-transfer version 1.0.1\n");
   printf("\n");
   printf("Usage: dsss-transfer [options] [filename]\n");
   printf("\n");
