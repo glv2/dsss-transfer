@@ -179,12 +179,12 @@ them:
 
 Send a file at 300 b/s using an audio cable:
 
-  cat file.dat | dsss-transfer -t -a -r io -s 48000 -f 12000 -b 300 | aplay -q -f S16_LE -r 48000 -c 1
+    cat file.dat | dsss-transfer -t -a -r io -s 48000 -f 12000 -b 300 | aplay -q -f S16_LE -r 48000 -c 1
 
 
 Receive a file at 300 b/s using an audio cable:
 
-  arecord -q -f S16_LE -r 48000 -c 1 | dsss-transfer -a -r io -s 48000 -f 12000 -b 300 -T 10 > file.dat
+    arecord -q -f S16_LE -r 48000 -c 1 | dsss-transfer -a -r io -s 48000 -f 12000 -b 300 -T 10 > file.dat
 
 
 ## Library
