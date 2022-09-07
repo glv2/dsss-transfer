@@ -96,5 +96,10 @@ check_nok_io "Wrong audio frequency 1500 2500" \
              "-a -s 48000 -f 1500 -b 30" \
              "-a -s 48000 -f 2500 -b 30"
 
+dd if=/dev/random of=${MESSAGE} bs=1000 count=200 status=none
+check_ok_file "Bit rate 8000000 and sample rate 1000000000" \
+              "-s 1000000000 -b 8000000" \
+              "-s 1000000000 -b 8000000"
+
 rm -f ${MESSAGE} ${DECODED} ${SAMPLES}
 echo "All tests passed."
