@@ -31,6 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define RECEPTION_GAIN "60"
 #define FREQUENCY_OFFSET 100000
 #define BIT_RATE 100
+#define SPREADING_FACTOR 64
 #define INNER_FEC "rs8"
 #define OUTER_FEC "rs8"
 
@@ -75,6 +76,7 @@ void transmit(unsigned char *data,
                                                            FREQUENCY_OFFSET,
                                                            TRANSMISSION_GAIN,
                                                            0,
+                                                           SPREADING_FACTOR,
                                                            INNER_FEC,
                                                            OUTER_FEC,
                                                            "",
@@ -119,6 +121,7 @@ void receive_1(unsigned char *data,
                                                            FREQUENCY_OFFSET,
                                                            RECEPTION_GAIN,
                                                            0,
+                                                           SPREADING_FACTOR,
                                                            INNER_FEC,
                                                            OUTER_FEC,
                                                            "",

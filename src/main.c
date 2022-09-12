@@ -66,6 +66,8 @@ void usage()
   printf("  -i <id>  (default: \"\")\n");
   printf("    Transfer id (at most 4 bytes). When receiving, the frames\n");
   printf("    with a different id will be ignored.\n");
+  printf("  -n <factor>  (default: 64, must be between 2 and 64)\n");
+  printf("    Spectrum spreading factor.\n");
   printf("  -o <offset>  (default: 0 Hz, can be negative)\n");
   printf("    Set the central frequency of the transceiver 'offset' Hz\n");
   printf("    lower than the signal frequency to send or receive.\n");
@@ -164,6 +166,7 @@ int main(int argc, char **argv)
   long int frequency_offset = 0;
   char *gain = "0";
   float ppm = 0;
+  unsigned int spreading_factor = 64;
   char inner_fec[32];
   char outer_fec[32];
   char *id = "";
@@ -179,7 +182,7 @@ int main(int argc, char **argv)
   strcpy(inner_fec, "h128");
   strcpy(outer_fec, "none");
 
-  while((opt = getopt(argc, argv, "ab:c:d:e:f:g:hi:o:r:s:T:tvw:")) != -1)
+  while((opt = getopt(argc, argv, "ab:c:d:e:f:g:hi:n:o:r:s:T:tvw:")) != -1)
   {
     switch(opt)
     {
@@ -217,6 +220,10 @@ int main(int argc, char **argv)
 
     case 'i':
       id = optarg;
+      break;
+
+    case 'n':
+      spreading_factor = strtoul(optarg, NULL, 10);
       break;
 
     case 'o':
@@ -274,6 +281,7 @@ int main(int argc, char **argv)
                                   frequency_offset,
                                   gain,
                                   ppm,
+                                  spreading_factor,
                                   inner_fec,
                                   outer_fec,
                                   id,

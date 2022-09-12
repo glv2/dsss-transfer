@@ -30,6 +30,8 @@ Options:
   -i <id>  (default: "")
     Transfer id (at most 4 bytes). When receiving, the frames
     with a different id will be ignored.
+  -n <factor>  (default: 64, must be between 2 and 64)
+    Spectrum spreading factor.
   -o <offset>  (default: 0 Hz, can be negative)
     Set the central frequency of the transceiver 'offset' Hz
     lower than the signal frequency to send or receive.
@@ -136,7 +138,7 @@ library, the following codes should also be available:
 ## Bandwidth
 
 The bandwidth of the generated signal is approximately
-(bit_rate * 80) Hertz.
+(bit_rate * 1.25 * spreading_factor) Hertz.
 
 
 ## Examples
@@ -177,14 +179,14 @@ them:
     aplay -f S16_LE -r 48000 -c 1 /tmp/samples.s16
 
 
-Send a file at 300 b/s using an audio cable:
+Send a file at 1200 b/s using an audio cable:
 
-    cat file.dat | dsss-transfer -t -a -r io -s 48000 -f 12000 -b 300 | aplay -q -f S16_LE -r 48000 -c 1
+    cat file.dat | dsss-transfer -t -a -r io -s 48000 -f 12000 -n 16 -b 1200 | aplay -q -f S16_LE -r 48000 -c 1
 
 
-Receive a file at 300 b/s using an audio cable:
+Receive a file at 1200 b/s using an audio cable:
 
-    arecord -q -f S16_LE -r 48000 -c 1 | dsss-transfer -a -r io -s 48000 -f 12000 -b 300 -T 10 > file.dat
+    arecord -q -f S16_LE -r 48000 -c 1 | dsss-transfer -a -r io -s 48000 -f 12000 -n 16 -b 1200 -T 10 > file.dat
 
 
 ## Library

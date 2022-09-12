@@ -45,6 +45,7 @@ unsigned char dsss_transfer_is_verbose();
  *    frequency higher)
  *  - gain: gain of the radio transceiver
  *  - ppm: correction for the radio clock
+ *  - spreading_factor: spectrum spreading factor
  *  - inner_fec: inner forward error correction code to use
  *  - outer_fec: outer forward error correction code to use
  *  - id: transfer id; when receiving, frames with a different id will be
@@ -65,6 +66,7 @@ dsss_transfer_t dsss_transfer_create(char *radio_driver,
                                      long int frequency_offset,
                                      char *gain,
                                      float ppm,
+                                     unsigned int spreading_factor,
                                      char *inner_fec,
                                      char *outer_fec,
                                      char *id,
@@ -104,6 +106,7 @@ dsss_transfer_t dsss_transfer_create_callback(char *radio_driver,
                                               long int frequency_offset,
                                               char *gain,
                                               float ppm,
+                                              unsigned int spreading_factor,
                                               char *inner_fec,
                                               char *outer_fec,
                                               char *id,

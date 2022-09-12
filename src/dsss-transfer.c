@@ -31,6 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <strings.h>
 #include <time.h>
 #include <unistd.h>
+#include "dsssframe.h"
 #include "dsss-transfer.h"
 
 #define TAU (2 * M_PI)
@@ -77,6 +78,7 @@ struct dsss_transfer_s
   unsigned int bit_rate;
   unsigned long int frequency;
   long int frequency_offset;
+  unsigned int spreading_factor;
   crc_scheme crc;
   fec_scheme inner_fec;
   fec_scheme outer_fec;
@@ -393,8 +395,7 @@ void send_dummy_samples(dsss_transfer_t transfer,
 void send_frames(dsss_transfer_t transfer)
 {
   unsigned int samples_per_symbol = 2;
-  unsigned int chip_size = 64;
-  float samples_per_bit = chip_size * samples_per_symbol;
+  float samples_per_bit = transfer->spreading_factor * samples_per_symbol;
   dsssframegenprops_s frame_properties;
   dsssframegen frame_generator;
   float resampling_ratio = (float) transfer->sample_rate / (transfer->bit_rate *
@@ -435,7 +436,8 @@ void send_frames(dsss_transfer_t transfer)
   frame_properties.check = transfer->crc;
   frame_properties.fec0 = transfer->inner_fec;
   frame_properties.fec1 = transfer->outer_fec;
-  frame_generator = dsssframegen_create(&frame_properties);
+  frame_generator = dsssframegen_create_set(transfer->spreading_factor,
+                                            &frame_properties);
   dsssframegen_set_header_props(frame_generator, &frame_properties);
   dsssframegen_set_header_len(frame_generator, header_size);
   memcpy(header, transfer->id, 4);
@@ -573,8 +575,7 @@ int frame_received(unsigned char *header,
 void receive_frames(dsss_transfer_t transfer)
 {
   unsigned int samples_per_symbol = 2;
-  unsigned int chip_size = 64;
-  float samples_per_bit = chip_size * samples_per_symbol;
+  float samples_per_bit = transfer->spreading_factor * samples_per_symbol;
   dsssframegenprops_s frame_properties;
   dsssframesync frame_synchronizer;
   float resampling_ratio = (transfer->bit_rate *
@@ -603,7 +604,9 @@ void receive_frames(dsss_transfer_t transfer)
   nco_crcf_set_frequency(oscillator, TAU * ((float) transfer->frequency_offset /
                                             transfer->sample_rate));
 
-  frame_synchronizer = dsssframesync_create(frame_received, transfer);
+  frame_synchronizer = dsssframesync_create_set(transfer->spreading_factor,
+                                                frame_received,
+                                                transfer);
   frame_properties.check = transfer->crc;
   frame_properties.fec0 = transfer->inner_fec;
   frame_properties.fec1 = transfer->outer_fec;
@@ -669,6 +672,7 @@ dsss_transfer_t dsss_transfer_create_callback(char *radio_driver,
                                               long int frequency_offset,
                                               char *gain,
                                               float ppm,
+                                              unsigned int spreading_factor,
                                               char *inner_fec,
                                               char *outer_fec,
                                               char *id,
@@ -764,6 +768,17 @@ dsss_transfer_t dsss_transfer_create_callback(char *radio_driver,
   else
   {
     fprintf(stderr, "Error: Invalid bit rate\n");
+    free(transfer);
+    return(NULL);
+  }
+
+  if(spreading_factor >= 2)
+  {
+    transfer->spreading_factor = spreading_factor;
+  }
+  else
+  {
+    fprintf(stderr, "Error: Invalid spreading factor\n");
     free(transfer);
     return(NULL);
   }
@@ -911,6 +926,7 @@ dsss_transfer_t dsss_transfer_create(char *radio_driver,
                                      long int frequency_offset,
                                      char *gain,
                                      float ppm,
+                                     unsigned int spreading_factor,
                                      char *inner_fec,
                                      char *outer_fec,
                                      char *id,
@@ -931,6 +947,7 @@ dsss_transfer_t dsss_transfer_create(char *radio_driver,
                                            frequency_offset,
                                            gain,
                                            ppm,
+                                           spreading_factor,
                                            inner_fec,
                                            outer_fec,
                                            id,

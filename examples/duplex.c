@@ -31,7 +31,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define UPLINK_SAMPLE_RATE 4000000
 #define UPLINK_GAIN "36"
 #define UPLINK_FREQUENCY_OFFSET 100000
-#define BIT_RATE 2400
+#define BIT_RATE 9600
+#define SPREADING_FACTOR 16
 #define INNER_FEC "none"
 #define OUTER_FEC "secded3932"
 
@@ -82,6 +83,7 @@ int main(int argc, char **argv)
                                   DOWNLINK_FREQUENCY_OFFSET,
                                   DOWNLINK_GAIN,
                                   0,
+                                  SPREADING_FACTOR,
                                   INNER_FEC,
                                   OUTER_FEC,
                                   "",
@@ -103,6 +105,7 @@ int main(int argc, char **argv)
                                 UPLINK_FREQUENCY_OFFSET,
                                 UPLINK_GAIN,
                                 0,
+                                SPREADING_FACTOR,
                                 INNER_FEC,
                                 OUTER_FEC,
                                 "",

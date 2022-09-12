@@ -2,7 +2,7 @@ AUTOMAKE_OPTIONS = foreign dist-lzip no-dist-gzip subdir-objects
 ACLOCAL_AMFLAGS = -I m4
 
 lib_LTLIBRARIES = libdsss-transfer.la
-libdsss_transfer_la_SOURCES = src/dsss-transfer.c
+libdsss_transfer_la_SOURCES = src/dsssframe.h src/dsssframegen.c src/dsssframesync.c src/dsss-transfer.c
 libdsss_transfer_la_LDFLAGS = -version-info 1:0:0
 
 bin_PROGRAMS = dsss-transfer
