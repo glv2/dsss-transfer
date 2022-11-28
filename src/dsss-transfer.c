@@ -33,18 +33,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <unistd.h>
 #include "dsssframe.h"
 #include "dsss-transfer.h"
+#include "gettext.h"
 
 #define TAU (2 * M_PI)
 
 #define MIN(x, y) ((x < y) ? x : y)
 #define MAX(x, y) ((x > y) ? x : y)
 
+#define _(string) gettext(string)
+
 #define SOAPYSDR_CHECK(funcall) \
 { \
   int e = funcall; \
   if(e != 0) \
   { \
-    fprintf(stderr, "Error: %s\n", SoapySDRDevice_lastError()); \
+    fprintf(stderr, _("Error: %s\n"), SoapySDRDevice_lastError()); \
     exit(EXIT_FAILURE); \
   } \
 }
@@ -429,7 +432,7 @@ void send_frames(dsss_transfer_t transfer)
 
   if((payload == NULL) || (frame_samples == NULL) || (samples == NULL))
   {
-    fprintf(stderr, "Error: Memory allocation failed\n");
+    fprintf(stderr, _("Error: Memory allocation failed\n"));
     exit(EXIT_FAILURE);
   }
 
@@ -551,11 +554,11 @@ int frame_received(unsigned char *header,
     {
       if(!header_valid)
       {
-        fprintf(stderr, "Frame %u for '%s': corrupted header\n", counter, id);
+        fprintf(stderr, _("Frame %u for '%s': corrupted header\n"), counter, id);
       }
       if(!payload_valid)
       {
-        fprintf(stderr, "Frame %u for '%s': corrupted payload\n", counter, id);
+        fprintf(stderr, _("Frame %u for '%s': corrupted payload\n"), counter, id);
       }
       fflush(stderr);
     }
@@ -564,7 +567,7 @@ int frame_received(unsigned char *header,
   {
     if(verbose)
     {
-      fprintf(stderr, "Frame %u for '%s': ignored\n", counter, id);
+      fprintf(stderr, _("Frame %u for '%s': ignored\n"), counter, id);
       fflush(stderr);
     }
   }
@@ -599,7 +602,7 @@ void receive_frames(dsss_transfer_t transfer)
 
   if((frame_samples == NULL) || (samples == NULL))
   {
-    fprintf(stderr, "Error: Memory allocation failed\n");
+    fprintf(stderr, _("Error: Memory allocation failed\n"));
     exit(EXIT_FAILURE);
   }
 
@@ -629,7 +632,7 @@ void receive_frames(dsss_transfer_t transfer)
     {
       if(verbose)
       {
-        fprintf(stderr, "Timeout: %d s without frames\n", transfer->timeout);
+        fprintf(stderr, _("Timeout: %d s without frames\n"), transfer->timeout);
       }
       break;
     }
@@ -692,7 +695,7 @@ dsss_transfer_t dsss_transfer_create_callback(char *radio_driver,
 
   if(transfer == NULL)
   {
-    fprintf(stderr, "Error: Memory allocation failed\n");
+    fprintf(stderr, _("Error: Memory allocation failed\n"));
     return(NULL);
   }
   bzero(transfer, sizeof(struct dsss_transfer_s));
@@ -722,7 +725,7 @@ dsss_transfer_t dsss_transfer_create_callback(char *radio_driver,
   }
   else
   {
-    fprintf(stderr, "Error: Invalid sample rate\n");
+    fprintf(stderr, _("Error: Invalid sample rate\n"));
     free(transfer);
     return(NULL);
   }
@@ -733,7 +736,7 @@ dsss_transfer_t dsss_transfer_create_callback(char *radio_driver,
   }
   else
   {
-    fprintf(stderr, "Error: Invalid frequency\n");
+    fprintf(stderr, _("Error: Invalid frequency\n"));
     free(transfer);
     return(NULL);
   }
@@ -756,7 +759,7 @@ dsss_transfer_t dsss_transfer_create_callback(char *radio_driver,
     }
     else
     {
-      fprintf(stderr, "Error: This radio type only supports IQ samples\n");
+      fprintf(stderr, _("Error: This radio type only supports IQ samples\n"));
       free(transfer);
       return(NULL);
     }
@@ -773,7 +776,7 @@ dsss_transfer_t dsss_transfer_create_callback(char *radio_driver,
   }
   else
   {
-    fprintf(stderr, "Error: Invalid bit rate\n");
+    fprintf(stderr, _("Error: Invalid bit rate\n"));
     free(transfer);
     return(NULL);
   }
@@ -784,7 +787,7 @@ dsss_transfer_t dsss_transfer_create_callback(char *radio_driver,
   }
   else
   {
-    fprintf(stderr, "Error: Invalid spreading factor\n");
+    fprintf(stderr, _("Error: Invalid spreading factor\n"));
     free(transfer);
     return(NULL);
   }
@@ -794,7 +797,7 @@ dsss_transfer_t dsss_transfer_create_callback(char *radio_driver,
   transfer->inner_fec = liquid_getopt_str2fec(inner_fec);
   if(transfer->inner_fec == LIQUID_FEC_UNKNOWN)
   {
-    fprintf(stderr, "Error: Invalid inner FEC\n");
+    fprintf(stderr, _("Error: Invalid inner FEC\n"));
     free(transfer);
     return(NULL);
   }
@@ -802,7 +805,7 @@ dsss_transfer_t dsss_transfer_create_callback(char *radio_driver,
   transfer->outer_fec = liquid_getopt_str2fec(outer_fec);
   if(transfer->outer_fec == LIQUID_FEC_UNKNOWN)
   {
-    fprintf(stderr, "Error: Invalid outer FEC\n");
+    fprintf(stderr, _("Error: Invalid outer FEC\n"));
     free(transfer);
     return(NULL);
   }
@@ -813,7 +816,7 @@ dsss_transfer_t dsss_transfer_create_callback(char *radio_driver,
   }
   else
   {
-    fprintf(stderr, "Error: Id must be at most 4 bytes long\n");
+    fprintf(stderr, _("Error: Id must be at most 4 bytes long\n"));
     free(transfer);
     return(NULL);
   }
@@ -823,7 +826,7 @@ dsss_transfer_t dsss_transfer_create_callback(char *radio_driver,
     transfer->dump = fopen(dump, "wb");
     if(transfer->dump == NULL)
     {
-      fprintf(stderr, "Error: Failed to open '%s'\n", dump);
+      fprintf(stderr, _("Error: Failed to open '%s'\n"), dump);
       free(transfer);
       return(NULL);
     }
@@ -851,7 +854,7 @@ dsss_transfer_t dsss_transfer_create_callback(char *radio_driver,
     }
     if(transfer->radio_device.file == NULL)
     {
-      fprintf(stderr, "Error: Failed to open '%s'\n", radio_driver + 5);
+      fprintf(stderr, _("Error: Failed to open '%s'\n"), radio_driver + 5);
       free(transfer);
       return(NULL);
     }
@@ -861,7 +864,7 @@ dsss_transfer_t dsss_transfer_create_callback(char *radio_driver,
     transfer->radio_device.soapysdr = SoapySDRDevice_makeStrArgs(radio_driver);
     if(transfer->radio_device.soapysdr == NULL)
     {
-      fprintf(stderr, "Error: %s\n", SoapySDRDevice_lastError());
+      fprintf(stderr, _("Error: %s\n"), SoapySDRDevice_lastError());
       free(transfer);
       return(NULL);
     }
@@ -906,7 +909,7 @@ dsss_transfer_t dsss_transfer_create_callback(char *radio_driver,
                                                                  NULL);
     if(transfer->radio_stream.soapysdr == NULL)
     {
-      fprintf(stderr, "Error: %s\n", SoapySDRDevice_lastError());
+      fprintf(stderr, _("Error: %s\n"), SoapySDRDevice_lastError());
       SoapySDRDevice_unmake(transfer->radio_device.soapysdr);
       free(transfer);
       return(NULL);
@@ -914,7 +917,7 @@ dsss_transfer_t dsss_transfer_create_callback(char *radio_driver,
     break;
 
   default:
-    fprintf(stderr, "Error: Unknown radio type\n");
+    fprintf(stderr, _("Error: Unknown radio type\n"));
     free(transfer);
     return(NULL);
     break;
@@ -978,7 +981,7 @@ dsss_transfer_t dsss_transfer_create(char *radio_driver,
     }
     if(transfer->file == NULL)
     {
-      fprintf(stderr, "Error: Failed to open '%s'\n", file);
+      fprintf(stderr, _("Error: Failed to open '%s'\n"), file);
       free(transfer);
       return(NULL);
     }
@@ -1052,14 +1055,14 @@ void dsss_transfer_start(dsss_transfer_t transfer)
   case IO:
     if(verbose)
     {
-      fprintf(stderr, "Info: Using IO pseudo-radio\n");
+      fprintf(stderr, _("Info: Using IO pseudo-radio\n"));
     }
     break;
 
   case FILENAME:
     if(verbose)
     {
-      fprintf(stderr, "Info: Using FILENAME pseudo-radio\n");
+      fprintf(stderr, _("Info: Using FILENAME pseudo-radio\n"));
     }
     break;
 
@@ -1107,7 +1110,7 @@ void dsss_transfer_print_available_radios()
 
   if(size == 0)
   {
-    printf("  No radio detected\n");
+    printf(_("  No radio detected\n"));
   }
   else
   {
