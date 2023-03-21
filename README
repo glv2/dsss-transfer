@@ -1,6 +1,8 @@
 dsss-transfer
 =============
 
+The active repository is at https://codeberg.org/glv/dsss-transfer
+
 dsss-transfer is a command-line program to send or receive data by software
 defined radio using the DSSS modulation.
 
